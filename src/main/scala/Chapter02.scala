@@ -1,15 +1,9 @@
-import org.apache.spark.sql.{SparkSession, DataFrame}
+import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
 object Chapter02 {
   def main(args: Array[String]): Unit = {
-    val spark = SparkSession.builder
-      .appName("Chapter02")
-      .master("local[*]")
-      .config("spark.sql.shuffle.partitions", "4")
-      .getOrCreate()
-    
-    spark.sparkContext.setLogLevel("WARN")
+    val spark = SparkSessionProvider.spark
     
     val flightData2015: DataFrame = spark
       .read

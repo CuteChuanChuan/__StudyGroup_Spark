@@ -15,7 +15,7 @@ libraryDependencies ++= Seq(
 import sbtassembly.AssemblyPlugin.autoImport.*
 import sbtassembly.MergeStrategy
 
-assembly / assemblyMergeStrategy := {
+assemblyMergeStrategy in assembly := {
   case PathList("META-INF", "io.netty.versions.properties") => MergeStrategy.discard
   case PathList("META-INF", "org/apache/logging/log4j/core/config/plugins/Log4j2Plugins.dat") => MergeStrategy.discard
   case PathList("META-INF", "versions", _*) => MergeStrategy.first
