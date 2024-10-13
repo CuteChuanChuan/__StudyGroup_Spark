@@ -1,7 +1,6 @@
-import org.apache.spark.sql.{SparkSession, DataFrame}
 import org.apache.spark.sql.functions._
 
-case class Flight(DEST_COUNTRY_NAME: String, ORIGIN_COUNTRY_NAME: String, count: BigInt)
+case class Flight(destCountryName: String, originCountryName: String, count: BigInt)
 
 object Chapter03 {
   
@@ -9,11 +8,7 @@ object Chapter03 {
   def main(args: Array[String]): Unit = {
     
     
-    val spark = SparkSession.builder
-      .appName("Chapter03")
-      .master("local[*]")
-      .config("spark.sql.shuffle.partitions", "4")
-      .getOrCreate()
+    val spark = SparkSessionProvider.spark
     
     import spark.implicits._
     
@@ -25,12 +20,12 @@ object Chapter03 {
     val flightData2015DataSet = flightData2015Parquet.as[Flight]
     
     flightData2015DataSet
-      .filter(flightRow => flightRow.ORIGIN_COUNTRY_NAME != "Canada")
+      .filter(flightRow => flightRow.originCountryName != "Canada")
       .show
     
     flightData2015DataSet
-      .filter(flightRow => flightRow.ORIGIN_COUNTRY_NAME != "Canada")
-      .map(eachRow => Flight(eachRow.DEST_COUNTRY_NAME, eachRow.ORIGIN_COUNTRY_NAME, eachRow.count + 5))
+      .filter(flightRow => flightRow.originCountryName != "Canada")
+      .map(eachRow => Flight(eachRow.destCountryName, eachRow.originCountryName, eachRow.count + 5))
       .show
     
     // Idea: Demonstrate Streaming
