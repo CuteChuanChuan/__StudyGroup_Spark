@@ -59,7 +59,7 @@ object Chapter05 {
     df.select(expr("DEST_COUNTRY_NAME AS destination")).show((2))
     df.select(expr("DEST_COUNTRY_NAME AS destination").alias("DEST_COUNTRY_NAME")).show((2))
     
-    // selectExpr is a single way to build up complex expressions
+    // selectExpr is a simple way to build up complex expressions
     df.selectExpr(
       "*",
       "(DEST_COUNTRY_NAME = ORIGIN_COUNTRY_NAME) AS withinCountry"
