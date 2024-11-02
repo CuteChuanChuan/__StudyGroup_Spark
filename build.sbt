@@ -8,8 +8,10 @@ lazy val root = (project in file("."))
   )
 
 libraryDependencies ++= Seq(
-  "org.apache.spark" %% "spark-core" % "3.5.0",
-  "org.apache.spark" %% "spark-sql" % "3.5.0"
+  "org.apache.spark" %% "spark-core" % "3.5.1" exclude("org.apache.logging.log4j", "log4j-slf4j-impl"),
+  "org.apache.spark" %% "spark-sql" % "3.5.0" exclude("org.apache.logging.log4j", "log4j-slf4j-impl"),
+  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.5",
+  "ch.qos.logback" % "logback-classic" % "1.3.5"
 )
 
 import sbtassembly.AssemblyPlugin.autoImport.*
