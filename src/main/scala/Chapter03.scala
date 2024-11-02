@@ -4,7 +4,6 @@ case class Flight(destCountryName: String, originCountryName: String, count: Big
 
 object Chapter03 {
   
-  
   def main(args: Array[String]): Unit = {
     
     

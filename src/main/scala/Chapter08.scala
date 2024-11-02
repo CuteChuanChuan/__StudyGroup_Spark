@@ -1,10 +1,8 @@
-import com.typesafe.scalalogging.Logger
 import org.apache.spark.sql.functions._
 
 object Chapter08 {
   def main(args: Array[String]): Unit = {
     val spark = SparkSessionProvider.spark
-    val logger = Logger(this.getClass.getName)
     
     import spark.implicits._
     
@@ -28,15 +26,11 @@ object Chapter08 {
     graduateProgram.createOrReplaceTempView("graduateProgram")
     sparkStatus.createOrReplaceTempView("sparkStatus")
     
-    logger.info("person table: ")
     spark.sql("SELECT * FROM person").show(truncate = false)
-    logger.info("graduateProgram table: ")
     spark.sql("SELECT * FROM graduateProgram").show(truncate = false)
-    logger.info("sparkStatus table: ")
     spark.sql("SELECT * FROM sparkStatus").show(truncate = false)
     
     // Inner Join
-    logger.info("Inner Join")
     val JoinExpr = person.col("graduate_program") === graduateProgram.col("id")
     var joinType = "inner"
     person.join(graduateProgram, JoinExpr).show(truncate = false)
@@ -50,7 +44,6 @@ object Chapter08 {
     spark.sql(innerJoinQuery).show(truncate = false)
     
     // Outer Join
-    logger.info("Outer Join")
     joinType = "outer"
     person.join(graduateProgram, JoinExpr, joinType).show(truncate = false)
     
@@ -62,7 +55,6 @@ object Chapter08 {
     spark.sql(outerJoinQuery).show(truncate = false)
     
     // Left Outer Join
-    logger.info("Left Outer Join")
     joinType = "left_outer"
     person.join(graduateProgram, JoinExpr, joinType).show(truncate = false)
     
@@ -74,7 +66,6 @@ object Chapter08 {
     spark.sql(leftOuterJoinQuery).show(truncate = false)
     
     // Right Outer Join
-    logger.info("Right Outer Join")
     joinType = "right_outer"
     person.join(graduateProgram, JoinExpr, joinType).show(truncate = false)
     
@@ -86,7 +77,6 @@ object Chapter08 {
     spark.sql(rightOuterJoinQuery).show(truncate = false)
     
     // Left Semi Join
-    logger.info("""Left Semi Join""")
     joinType = "left_semi"
     graduateProgram.join(person, JoinExpr, joinType).show(truncate = false)
     
@@ -100,12 +90,10 @@ object Chapter08 {
     val gradProgram2 = graduateProgram.union(Seq(
       (0, "Masters", "Duplicated Row", "Duplicated School")).toDF())
     gradProgram2.createOrReplaceTempView("gradProgram2")
-    logger.info("Add a duplicated row to gradProgram: ")
     spark.sql("select * from gradProgram2").show(truncate = false)
     gradProgram2.join(person, JoinExpr, joinType).show(truncate = false)
     
     // Left Anti Join
-    logger.info("""Left Anti Join""")
     joinType = "left_anti"
     graduateProgram.join(person, JoinExpr, joinType).show(truncate = false)
     
@@ -117,7 +105,6 @@ object Chapter08 {
     spark.sql(leftAntiJoinQuery).show(truncate = false)
     
     // Cross Join
-    logger.info("""Cross Join""")
     joinType = "cross"
     graduateProgram.crossJoin(person).show(numRows = 20, truncate = false)
     graduateProgram.join(person, JoinExpr, joinType).show(numRows = 20, truncate = false)
@@ -130,7 +117,6 @@ object Chapter08 {
     spark.sql(crossJoinQuery).show(truncate = false)
     
     // Join with complex types
-    logger.info("""Join with complex types""")
     joinType = "inner"
     person
       .withColumnRenamed("id", "personId")
@@ -139,7 +125,6 @@ object Chapter08 {
     
     // Duplicated columns names
     val gradProgramDupe = graduateProgram.withColumnRenamed("id", "graduate_program")
-    logger.info("gradProgramDupe table: ")
     gradProgramDupe.show(truncate = false)
     val joinExpr = gradProgramDupe.col("graduate_program") === person.col("graduate_program")
     gradProgramDupe.show(truncate = false)
@@ -149,17 +134,14 @@ object Chapter08 {
     //    person.join(gradProgramDupe, joinExpr).select("graduate_program").show(truncate = false)
     
     // Approach 1: different join expression
-    logger.info("Approach 1: different join expression")
     person.join(gradProgramDupe, "graduate_program").show()
     person.join(gradProgramDupe, "graduate_program").select("graduate_program").show()
     // Approach 2:  dropping the column after join
-    logger.info("Approach 2: dropping the column after join")
     person.join(gradProgramDupe, joinExpr).drop(person.col("graduate_program")).show()
     person.join(gradProgramDupe, joinExpr).drop(person.col("graduate_program")).select("graduate_program").show()
     // Approach 3: Renaming a column before the join
     val gradProgram3 = graduateProgram.withColumnRenamed("id", "grad_id")
     val joinExpr2 = person.col("graduate_program") === gradProgram3.col("grad_id")
-    logger.info("Approach 3: Renaming a column before the join")
     person.join(gradProgram3, joinExpr2).show()
     
     val joinExpr3 = person.col("graduate_program") === graduateProgram.col("id")
