@@ -8,23 +8,21 @@ lazy val root = (project in file("."))
   )
 
 libraryDependencies ++= Seq(
-  "org.apache.spark" %% "spark-core" % "3.5.1" exclude("org.apache.logging.log4j", "log4j-slf4j-impl"),
-  "org.apache.spark" %% "spark-sql" % "3.5.0" exclude("org.apache.logging.log4j", "log4j-slf4j-impl"),
-  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.5",
-  "ch.qos.logback" % "logback-classic" % "1.3.5"
+  "org.apache.spark" %% "spark-core" % "3.5.1",
+  "org.apache.spark" %% "spark-sql" % "3.5.0",
 )
 
-import sbtassembly.AssemblyPlugin.autoImport.*
+import sbtassembly.AssemblyPlugin.autoImport._
 import sbtassembly.MergeStrategy
 
-assemblyMergeStrategy in assembly := {
-  case PathList("META-INF", "io.netty.versions.properties") => MergeStrategy.discard
-  case PathList("META-INF", "org/apache/logging/log4j/core/config/plugins/Log4j2Plugins.dat") => MergeStrategy.discard
-  case PathList("META-INF", "versions", _*) => MergeStrategy.first
-  case PathList("module-info.class") => MergeStrategy.discard
-  case PathList("google", "protobuf", _*) => MergeStrategy.first
-  case PathList("org", "apache", "commons", "logging", _*) => MergeStrategy.first
-  case PathList("arrow-git.properties") => MergeStrategy.first
-  case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+
+javaOptions ++= Seq(
+  "--add-opens", "java.base/java.nio=ALL-UNNAMED",
+  "--add-opens", "java.base/sun.nio.ch=ALL-UNNAMED",
+  "--illegal-access=deny"
+)
+
+assembly / assemblyMergeStrategy := {
+  case PathList("META-INF", _*) => MergeStrategy.discard
   case x => MergeStrategy.first
 }

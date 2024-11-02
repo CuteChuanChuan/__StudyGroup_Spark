@@ -1,6 +1,5 @@
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.expressions._
-import org.apache.spark.sql.types._
 
 object Chapter07 {
   def main(args: Array[String]): Unit = {
