@@ -28,6 +28,13 @@ object Chapter08 {
     graduateProgram.createOrReplaceTempView("graduateProgram")
     sparkStatus.createOrReplaceTempView("sparkStatus")
     
+    logger.info("person table: ")
+    spark.sql("SELECT * FROM person").show(truncate = false)
+    logger.info("graduateProgram table: ")
+    spark.sql("SELECT * FROM graduateProgram").show(truncate = false)
+    logger.info("sparkStatus table: ")
+    spark.sql("SELECT * FROM sparkStatus").show(truncate = false)
+    
     // Inner Join
     logger.info("Inner Join")
     val JoinExpr = person.col("graduate_program") === graduateProgram.col("id")
@@ -93,6 +100,8 @@ object Chapter08 {
     val gradProgram2 = graduateProgram.union(Seq(
       (0, "Masters", "Duplicated Row", "Duplicated School")).toDF())
     gradProgram2.createOrReplaceTempView("gradProgram2")
+    logger.info("Add a duplicated row to gradProgram: ")
+    spark.sql("select * from gradProgram2").show(truncate = false)
     gradProgram2.join(person, JoinExpr, joinType).show(truncate = false)
     
     // Left Anti Join
@@ -110,8 +119,8 @@ object Chapter08 {
     // Cross Join
     logger.info("""Cross Join""")
     joinType = "cross"
-    graduateProgram.join(person, JoinExpr, joinType).show(truncate = false)
-    graduateProgram.crossJoin(person).show(truncate = false)
+    graduateProgram.crossJoin(person).show(numRows = 20, truncate = false)
+    graduateProgram.join(person, JoinExpr, joinType).show(numRows = 20, truncate = false)
     
     val crossJoinQuery: String =
       s"""
@@ -130,20 +139,27 @@ object Chapter08 {
     
     // Duplicated columns names
     val gradProgramDupe = graduateProgram.withColumnRenamed("id", "graduate_program")
+    logger.info("gradProgramDupe table: ")
+    gradProgramDupe.show(truncate = false)
     val joinExpr = gradProgramDupe.col("graduate_program") === person.col("graduate_program")
     gradProgramDupe.show(truncate = false)
     person.join(gradProgramDupe, joinExpr).show()
     
     // this will throw an error
-    // person.join(gradProgramDupe, joinExpr).select("graduate_program").show(truncate = false)
+    //    person.join(gradProgramDupe, joinExpr).select("graduate_program").show(truncate = false)
     
     // Approach 1: different join expression
+    logger.info("Approach 1: different join expression")
+    person.join(gradProgramDupe, "graduate_program").show()
     person.join(gradProgramDupe, "graduate_program").select("graduate_program").show()
     // Approach 2:  dropping the column after join
+    logger.info("Approach 2: dropping the column after join")
+    person.join(gradProgramDupe, joinExpr).drop(person.col("graduate_program")).show()
     person.join(gradProgramDupe, joinExpr).drop(person.col("graduate_program")).select("graduate_program").show()
     // Approach 3: Renaming a column before the join
     val gradProgram3 = graduateProgram.withColumnRenamed("id", "grad_id")
     val joinExpr2 = person.col("graduate_program") === gradProgram3.col("grad_id")
+    logger.info("Approach 3: Renaming a column before the join")
     person.join(gradProgram3, joinExpr2).show()
     
     val joinExpr3 = person.col("graduate_program") === graduateProgram.col("id")
