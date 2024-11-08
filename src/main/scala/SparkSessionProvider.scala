@@ -8,9 +8,9 @@ object SparkSessionProvider {
       .master("local[*]")
       .config("spark.sql.shuffle.partitions", "4")
       .getOrCreate()
-    
+
     session.sparkContext.setLogLevel("WARN")
-    
+
     session
   }
 }
