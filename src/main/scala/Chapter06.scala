@@ -132,7 +132,6 @@ object Chapter06 {
     val selectedColumns = simpleColors.map { color =>
       col("Description").contains(color.toUpperCase).alias(s"is_$color")
     }
-      :+ expr("*")
 
     df.select(selectedColumns: _*)
       .where(col("is_white").or(col("is_red")))
